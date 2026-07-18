@@ -24,25 +24,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # Tidak pakai cache: 'npm' — pnpm workspace, bukan npm
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Cache pnpm store
+      - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-pnpm-
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: npm install
 
       - name: Generate Android project (expo prebuild)
-        working-directory: artifacts/zigzag-dashboard
         run: npx expo prebuild --platform android --no-install --clean
         env:
           EXPO_NO_TELEMETRY: 1
@@ -53,11 +46,11 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('artifacts/zigzag-dashboard/android/**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build debug APK
-        working-directory: artifacts/zigzag-dashboard/android
+        working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
@@ -65,16 +58,9 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
           GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
 
-      - name: Rename & upload APK
-        run: |
-          mkdir -p output
-          cp artifacts/zigzag-dashboard/android/app/build/outputs/apk/debug/app-debug.apk \
-             output/zigzag-fibo-$(date +%Y%m%d-%H%M).apk
-          ls -lh output/
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ZIGZAG_FIBO-APK
-          path: output/*.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
