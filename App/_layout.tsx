@@ -39,8 +39,6 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
-  // appReady: true ketika font selesai (atau error), ATAU setelah 3 detik timeout.
-  // Ini mencegah splash stuck selamanya jika useFonts hang di debug APK.
   const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
@@ -50,7 +48,7 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  // Safety net: paksa hide splash setelah 3 detik
+  // Safety net: paksa hide splash setelah 3 detik jika font loading hang
   useEffect(() => {
     const timer = setTimeout(() => {
       SplashScreen.hideAsync().catch(() => {});
