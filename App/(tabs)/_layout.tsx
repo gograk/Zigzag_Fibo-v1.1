@@ -2,36 +2,15 @@ import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
 import { Tabs } from 'expo-router';
-import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 
-function NativeTabLayout() {
-  return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="index">
-        <Icon sf={{ default: 'square.grid.2x2', selected: 'square.grid.2x2.fill' }} />
-        <Label>Dashboard</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="sinyal">
-        <Icon sf={{ default: 'chart.bar', selected: 'chart.bar.fill' }} />
-        <Label>Sinyal</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="fibo">
-        <Icon sf={{ default: 'chart.line.uptrend.xyaxis', selected: 'chart.line.uptrend.xyaxis' }} />
-        <Label>Fibo</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
-  );
-}
+const GOLD = '#ffd700';
+const DIM = '#555555';
+const BG = '#0f1219';
 
-function ClassicTabLayout() {
-  const isWeb = Platform.OS === 'web';
+export default function TabLayout() {
   const isIOS = Platform.OS === 'ios';
-
-  const GOLD = '#ffd700';
-  const DIM = '#555555';
-  const BG = '#0f1219';
+  const isWeb = Platform.OS === 'web';
 
   return (
     <Tabs
@@ -51,9 +30,9 @@ function ClassicTabLayout() {
         tabBarBackground: () =>
           isIOS ? (
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
-          ) : isWeb ? (
+          ) : (
             <View style={[StyleSheet.absoluteFill, { backgroundColor: BG }]} />
-          ) : null,
+          ),
         tabBarLabelStyle: {
           fontFamily: 'Inter_500Medium',
           fontSize: 10,
@@ -89,11 +68,4 @@ function ClassicTabLayout() {
       />
     </Tabs>
   );
-}
-
-export default function TabLayout() {
-  if (isLiquidGlassAvailable()) {
-    return <NativeTabLayout />;
-  }
-  return <ClassicTabLayout />;
 }
